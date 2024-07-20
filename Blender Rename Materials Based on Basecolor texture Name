@@ -1,0 +1,30 @@
+import bpy
+import os
+
+def rename_materials_to_texture_names():
+    # Get all materials in the scene
+    materials = bpy.data.materials
+
+    for mat in materials:
+        # Check if the material has a node tree
+        if mat.node_tree:
+            # Iterate over all nodes in the material node tree
+            for node in mat.node_tree.nodes:
+                # Check if the node is a Principled BSDF node
+                if node.type == 'BSDF_PRINCIPLED':
+                    # Check if the node has a base color texture
+                    if node.inputs['Base Color'].is_linked:
+                        # Get the base color texture node
+                        base_color_texture_node = node.inputs['Base Color'].links[0].from_node
+                        # Get the texture file path
+                        texture_path = bpy.path.abspath(base_color_texture_node.image.filepath)
+                        # Extract the filename from the path
+                        texture_name = os.path.splitext(os.path.basename(texture_path))[0]
+                        # Rename the material to the texture name
+                        mat.name = texture_name
+
+# Call the function to rename materials to base color texture names
+rename_materials_to_texture_names()
+
+
+#This script iterates through all materials in your Blender scene. For each material with a node tree, it checks if there's a Principled BSDF node and if it has a base color texture connected. If so, it extracts the filename of the base color texture and renames the material to that filename.
